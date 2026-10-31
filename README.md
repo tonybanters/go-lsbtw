@@ -33,29 +33,25 @@ go build -o go-lsbtw ls.go # compile
   - `Uid` / `Gid` -> owner and group names via `user.LookupId` / `user.LookupGroupId`
   - `file_info.Size()` -> size in bytes
   - `file_info.ModTime()` -> modification time, formatted with `time.Format("Jan _2 15:04")`
+  - `os.Readlink()` -> real file path for links, when `syscall.S_IFLNK`
 
 ## where we left off
 
-the output is correct field-for-field, but it differs from real `ls` in two ways,
-both of which are presentation, not filesystem logic:
+the output is correct field-for-field, but it differs from real `ls` in how
+   padding is determined
 
-1. **padding / alignment.** the link count and size columns are single spaced and
-   ragged. real `ls` right-aligns them into nice columns.
-   *Hint:* `%*d` works in go's `fmt` too
-
-2. **symlink targets.** a symlink prints as `link`. real `ls -l` prints
-   `link -> ../link.txt`.
-   *Hint:* `os.Readlink`
+**padding / alignment.** the link count and size columns are padded naively.
+   real `ls` right-aligns them into nice columns, based off the largest number in each column.
 
 sorting you get for free: `os.ReadDir` already returns entries sorted by filename,
 which is the part we had to write by hand in the C video.
 
-if you followed the video, you've got everything you need to add both.
+if you followed the video, you've got almost everything you need to add.
 
 ## contributing
 
-feel free to contribute any hand written ls args, or specifically the padding and the
-symlink target that i displayed at the end of the video.
+feel free to contribute any hand written ls args, or specifically the padding and
+   that was displayed at the end of the video.
 
 cheers.
 

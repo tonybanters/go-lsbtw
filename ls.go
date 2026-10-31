@@ -84,7 +84,8 @@ func mode_string(mode uint32) string {
 }
 
 func print_long(dir, name string) {
-	file_info, error := os.Lstat(filepath.Join(dir, name))
+	path := filepath.Join(dir, name)
+	file_info, error := os.Lstat(path)
 	if error != nil {
 		fmt.Fprintf(os.Stderr, "%s: %v\n", name, error)
 		return
@@ -97,7 +98,12 @@ func print_long(dir, name string) {
 	if g, error := user.LookupGroupId(strconv.Itoa(int(file_stats.Gid))); error == nil {
 		group = g.Name
 	}
-	fmt.Printf("%s %d %s %s %d %s %s\n",
+	if file_stats.Mode & syscall.S_IFLNK != 0 {
+		if real_path, error := os.Readlink(path); error == nil {
+			name = name + " -> " + real_path
+		}
+	}
+	fmt.Printf("%s %2d %s %s %10d %s %s\n",
 		mode_string(file_stats.Mode),
 		file_stats.Nlink,
 		owner,
